@@ -17,7 +17,6 @@ class ExamplesTest {
   void testTryParseCity(final Function<Merchant, String> cityParser) {
     Assertions.assertNull(cityParser.apply(null));
 
-
     Assertions.assertNull(cityParser.apply(
         Merchant.builder().build())
     );
@@ -39,7 +38,8 @@ class ExamplesTest {
 
   private static List<Function<Merchant, String>> cityParsingFunctions() {
     return Arrays.asList(
-        Examples::tryParseCityUsingNestedNullChecks,
+        Examples::tryParseCityUsingNestedNullChecksAndReassignment,
+        Examples::tryParseCityUsingNestedNullChecksWithoutReassignment,
         Examples::tryParseCityUsingOptionalChaining
     );
   }

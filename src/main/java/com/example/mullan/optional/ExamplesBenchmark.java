@@ -3,8 +3,11 @@ package com.example.mullan.optional;
 import com.example.mullan.optional.data.Address;
 import com.example.mullan.optional.data.Merchant;
 
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+
 public class ExamplesBenchmark {
-  private static final long ONE_BILLION = 1_000_000;
+  private static final long ONE_BILLION = 100_000_000;
   private static final String MILPITAS = "milpitas";
 
   private static final Merchant MERCHANT = Merchant.builder()
@@ -15,26 +18,62 @@ public class ExamplesBenchmark {
       )
       .build();
 
-  public static void main(final String[] args) {
-    final Long startTimeMillis = System.currentTimeMillis();
-    doNullChecks();
-    final Long completedNullChecksMillis = System.currentTimeMillis();
-    doOptionalChaining();
-    final Long completedOptionalChainingMillis = System.currentTimeMillis();
+  private static Long prevMillis;
+  private static Long prevGCCollectionTime;
 
-    System.out.println(String.format("Completed null checks in %s millis", completedNullChecksMillis - startTimeMillis));
-    System.out.println(String.format("Completed optional chaining in %s millis", completedOptionalChainingMillis - completedNullChecksMillis));
+  public static void main(final String[] args) {
+    init();
+
+
+    doNullChecksWithoutReassignment();
+    recordEvents("doNullChecksWithoutReassignment");
+
+    doNullChecks();
+    recordEvents("doNullChecks");
+
+    doOptionalChaining();
+    recordEvents("doOptionalChaining");
+
+  }
+
+  private static void init() {
+    prevMillis = System.currentTimeMillis();
+    prevGCCollectionTime = getCurrentGCCollectionTime();
+  }
+
+  private static void recordEvents(final String operationName) {
+    final Long now = System.currentTimeMillis();
+    final Long gc = getCurrentGCCollectionTime();
+
+    System.out.println(String.format("Previous operation %s took %s millis", operationName, now - prevMillis));
+    prevMillis = now;
+    System.out.println(String.format("Previous operation %s result in %s millis of GC", operationName, gc - prevGCCollectionTime));
+    prevGCCollectionTime = gc;
   }
 
   private static void doNullChecks() {
-    BenchmarkHelper.repeat(ONE_BILLION, () -> Examples.tryParseCityUsingNestedNullChecks(MERCHANT));
+    for (int i = 0; i < ONE_BILLION; i++) {
+      Examples.tryParseCityUsingNestedNullChecksAndReassignment(MERCHANT);
+    }
+  }
+
+  private static void doNullChecksWithoutReassignment() {
+    for (int i = 0; i < ONE_BILLION; i++) {
+      Examples.tryParseCityUsingNestedNullChecksWithoutReassignment(MERCHANT);
+    }
   }
 
   private static void doOptionalChaining() {
-    BenchmarkHelper.repeat(ONE_BILLION, () -> Examples.tryParseCityUsingOptionalChaining(MERCHANT));
+    for (int i = 0; i < ONE_BILLION; i++) {
+      Examples.tryParseCityUsingOptionalChaining(MERCHANT);
+    }
   }
 
-  private static void startTimer() {
-    System.currentTimeMillis();
+  private static Long getCurrentGCCollectionTime() {
+    return ManagementFactory
+        .getGarbageCollectorMXBeans()
+        .stream()
+        .map(GarbageCollectorMXBean::getCollectionTime)
+        .reduce(0L, Long::sum);
   }
 }

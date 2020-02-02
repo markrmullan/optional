@@ -2,11 +2,12 @@ package com.example.mullan.optional;
 
 import com.example.mullan.optional.data.Address;
 import com.example.mullan.optional.data.Merchant;
+import com.sun.istack.internal.Nullable;
 
 import java.util.Optional;
 
 class Examples {
-  static String tryParseCityUsingNestedNullChecks(final Merchant merchant) {
+  static String tryParseCityUsingNestedNullChecksAndReassignment(@Nullable final Merchant merchant) {
     if (merchant != null) {
       final Address address = merchant.getAddress();
 
@@ -22,7 +23,17 @@ class Examples {
     return null;
   }
 
-  static String tryParseCityUsingOptionalChaining(final Merchant merchant) {
+  static String tryParseCityUsingNestedNullChecksWithoutReassignment(@Nullable final Merchant merchant) {
+    final boolean hasCity = merchant != null &&
+                            merchant.getAddress() != null &&
+                            merchant.getAddress().getCity() != null;
+
+    return hasCity ?
+        merchant.getAddress().getCity().toUpperCase() :
+        null;
+  }
+
+  static String tryParseCityUsingOptionalChaining(@Nullable  final Merchant merchant) {
     return Optional.ofNullable(merchant)
         .map(Merchant::getAddress)
         .map(Address::getCity)
@@ -30,11 +41,13 @@ class Examples {
         .orElse(null);
   }
 
-  static String __unsafeTryParseCityWithOptionalChaining(final Merchant merchant) {
+  static String __unsafeTryParseCityWithOptionalChaining(@Nullable  final Merchant merchant) {
     return Optional.of(merchant)
         .map(Merchant::getAddress)
         .map(Address::getCity)
         .map(String::toUpperCase)
         .orElse(null);
   }
+
+  private Examples() {}
 }
