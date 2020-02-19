@@ -1,19 +1,28 @@
 package com.example.mullan.optional;
 
 import com.example.mullan.optional.data.Address;
+import com.example.mullan.optional.data.City;
 import com.example.mullan.optional.data.Merchant;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.util.stream.LongStream;
 
 public class ExamplesBenchmark {
-  private static final long ONE_BILLION = 100_000_000;
+  private static final long ONE_MILLION = 1_000_000;
+  private static final long TEN_MILLION = 10_000_000;
+  private static final long ONE_HUNDRED_MILLION = 100_000_000;
+  private static final long ONE_BILLION = 1_000_000_000;
   private static final String MILPITAS = "milpitas";
 
   private static final Merchant MERCHANT = Merchant.builder()
       .address(
           Address.builder()
-              .city(MILPITAS)
+              .city(
+                  City.builder()
+                      .name(MILPITAS)
+                      .build()
+              )
               .build()
       )
       .build();
@@ -21,19 +30,46 @@ public class ExamplesBenchmark {
   private static Long prevMillis;
   private static Long prevGCCollectionTime;
 
+  /**
+   * The order in which these methods are invoked might influence runtime-- anecdotally, on my local machine, I consistently
+   * found that the first method invoked had a longer runtime that subsequent methods that were called. e.g., if I called
+   * {@link ExamplesBenchmark#doNullChecks()} before {@link ExamplesBenchmark#doNullChecksWithoutReassignment()}, I would consistently
+   * find that it took {@link ExamplesBenchmark#doNullChecks()} longer to run. However, if the order in which the functions were called
+   * was reversed, I found the opposite to be true, and {@link ExamplesBenchmark#doNullChecksWithoutReassignment()} would
+   * purportedly run faster. Suffice to say, take this all with a grain of salt, and YMMV depending on the machine you are running
+   * this code on.
+   *
+   * @param args ignored
+   */
   public static void main(final String[] args) {
     init();
 
-
-    doNullChecksWithoutReassignment();
-    recordEvents("doNullChecksWithoutReassignment");
-
-    doNullChecks();
-    recordEvents("doNullChecks");
+    doOptionalChaining();
+    logTimeElapsed("doOptionalChaining");
 
     doOptionalChaining();
-    recordEvents("doOptionalChaining");
+    logTimeElapsed("doOptionalChaining");
 
+    doOptionalChaining();
+    logTimeElapsed("doOptionalChaining");
+
+    //doNullChecksWithoutReassignment();
+    //logTimeElapsed("doNullChecksWithoutReassignment");
+    //
+    //doNullChecksWithoutReassignment();
+    //logTimeElapsed("doNullChecksWithoutReassignment");
+    //
+    //doNullChecksWithoutReassignment();
+    //logTimeElapsed("doNullChecksWithoutReassignment");
+
+    //doNullChecks();
+    //logTimeElapsed("doNullChecks");
+    //
+    //doNullChecks();
+    //logTimeElapsed("doNullChecks");
+    //
+    //doNullChecks();
+    //logTimeElapsed("doNullChecks");
   }
 
   private static void init() {
@@ -41,7 +77,7 @@ public class ExamplesBenchmark {
     prevGCCollectionTime = getCurrentGCCollectionTime();
   }
 
-  private static void recordEvents(final String operationName) {
+  private static void logTimeElapsed(final String operationName) {
     final Long now = System.currentTimeMillis();
     final Long gc = getCurrentGCCollectionTime();
 
@@ -51,22 +87,24 @@ public class ExamplesBenchmark {
     prevGCCollectionTime = gc;
   }
 
+  private static void repeat(final long times, final Runnable action) {
+    LongStream.range(0L, times)
+        .forEach(i -> action.run());
+  }
+
   private static void doNullChecks() {
-    for (int i = 0; i < ONE_BILLION; i++) {
-      Examples.tryParseCityUsingNestedNullChecksAndReassignment(MERCHANT);
-    }
+    repeat(ONE_BILLION,
+        () -> Examples.tryParseCityUsingNestedNullChecksAndReassignment(MERCHANT));
   }
 
   private static void doNullChecksWithoutReassignment() {
-    for (int i = 0; i < ONE_BILLION; i++) {
-      Examples.tryParseCityUsingNestedNullChecksWithoutReassignment(MERCHANT);
-    }
+    repeat(ONE_BILLION,
+        () -> Examples.tryParseCityUsingNestedNullChecksWithoutReassignment(MERCHANT));
   }
 
   private static void doOptionalChaining() {
-    for (int i = 0; i < ONE_BILLION; i++) {
-      Examples.tryParseCityUsingOptionalChaining(MERCHANT);
-    }
+    repeat(ONE_BILLION,
+        () -> Examples.tryParseCityUsingOptionalChaining(MERCHANT));
   }
 
   private static Long getCurrentGCCollectionTime() {

@@ -1,6 +1,7 @@
 package com.example.mullan.optional;
 
 import com.example.mullan.optional.data.Address;
+import com.example.mullan.optional.data.City;
 import com.example.mullan.optional.data.Merchant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,11 @@ class ExamplesTest {
     Assertions.assertEquals("TEMPE",
         cityParser.apply(
             Merchant.builder()
-                .address(Address.builder().city("tempe").build())
+                .address(Address.builder()
+                    .city(City.builder()
+                        .name("tempe")
+                        .build())
+                    .build())
                 .build()
         )
     );

@@ -8,7 +8,5 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class Merchant {
-  private String name;
-
   private Address address;
 }

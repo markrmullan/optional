@@ -7,6 +7,8 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class Address {
-  private City city;
+public class City {
+  private String name;
+
+  private Long population;
 }
