@@ -4,6 +4,8 @@
 
 This project aims to measure, quantify, and compare differences in performance when using `java.util.Optional` to null-check small blocks of code, compared against equivalent traditional, pre-Java 8 ways to accomplish the same task.
 
+This repo accompanies [this Medium post](https://medium.com/@markmullan/benchmarking-java-8-optional-performance-566a2c6cd51c) which goes into more detail.
+
 ref `Examples.java` for the application code, `ExamplesTest.java` for sample unit tests and sanity-check assertions, and `ExamplesBenchmark.java` for everything performance related.
 
 ### Steps to use
