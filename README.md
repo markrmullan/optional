@@ -18,9 +18,9 @@ ref `Examples.java` for the application code, `ExamplesTest.java` for sample uni
 
 ```
 Previous operation doOptionalChaining took 62036 millis
-Previous operation doOptionalChaining result in 518 millis of GC
+Previous operation doOptionalChaining resulted in 518 millis of GC
 Previous operation doOptionalChaining took 60095 millis
-Previous operation doOptionalChaining result in 542 millis of GC
+Previous operation doOptionalChaining resulted in 542 millis of GC
 Previous operation doOptionalChaining took 59221 millis
-Previous operation doOptionalChaining result in 525 millis of GC
+Previous operation doOptionalChaining resulted in 525 millis of GC
 ```

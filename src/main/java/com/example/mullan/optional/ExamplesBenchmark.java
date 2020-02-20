@@ -83,7 +83,7 @@ public class ExamplesBenchmark {
 
     System.out.println(String.format("Previous operation %s took %s millis", operationName, now - prevMillis));
     prevMillis = now;
-    System.out.println(String.format("Previous operation %s result in %s millis of GC", operationName, gc - prevGCCollectionTime));
+    System.out.println(String.format("Previous operation %s resulted in %s millis of GC", operationName, gc - prevGCCollectionTime));
     prevGCCollectionTime = gc;
   }
 
